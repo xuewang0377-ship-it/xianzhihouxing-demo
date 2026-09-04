@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>先知后行 · 让账号诊断有依据，让品类拓新有指南</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --p:#E91E63;--p2:#FF6F91;--p3:#AD1457;
+  --pbg:#FCE4EC;--pbg2:#FFF5F7;--pline:#FDE4EC;
+  --ink:#2A2A2A;--ink2:#5F5F6B;--ink3:#9A9AA6;
+  --line:#F0E6EA;--card:#FFF;
+  --ok:#00A870;--warn:#FF8F1F;--bad:#E5484D;
+  --sh:0 4px 16px rgba(233,30,99,.08);
+  --sh2:0 8px 28px rgba(233,30,99,.14);
+  --c1:#E91E63;--c2:#FF6F91;--c3:#FFA5B8;--c4:#C2185B;--c5:#F8BBD0;--c6:#AD1457;
+}
+html{scroll-behavior:smooth}
+body{background:linear-gradient(180deg,#FFF5F7 0%,#FFE8EF 100%);background-attachment:fixed;
+  color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
+  line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:40px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+a{color:inherit;text-decoration:none}
+svg{display:block;overflow:visible}
+
+/* ── topbar ── */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(255,247,249,.93);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--pline);margin-bottom:22px}
+.tbin{max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font-size:20px;font-weight:800;letter-spacing:-.5px}
+.brand em{font-style:normal;background:linear-gradient(135deg,var(--p2),var(--p));-webkit-background-clip:text;
+  background-clip:text;-webkit-text-fill-color:transparent}
+.brandsub{font-size:12px;color:var(--ink3);font-weight:600}
+.sp{flex:1}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{padding:8px 16px;border-radius:9px;font-size:13.5px;font-weight:650;color:var(--ink2);
+  background:#fff;border:1px solid var(--pline);cursor:pointer;font-family:inherit;transition:.2s;white-space:nowrap}
+.tab:hover{color:var(--p);border-color:var(--p2)}
+.tab.on{background:linear-gradient(135deg,var(--p2),var(--p));color:#fff;border-color:transparent;
+  box-shadow:0 3px 10px rgba(233,30,99,.28)}
+
+.page{display:none;animation:fi .35s cubic-bezier(.16,1,.3,1)}
+.page.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ── hero ── */
+.hero{background:linear-gradient(135deg,#FF6F91 0%,#E91E63 60%,#C2185B 100%);border-radius:20px;
+  padding:46px 44px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--sh2)}
+.hero::before{content:"";position:absolute;right:-70px;top:-70px;width:260px;height:260px;border-radius:50%;
+  background:rgba(255,255,255,.12)}
+.hero::after{content:"";position:absolute;right:90px;bottom:-110px;width:200px;height:200px;border-radius:50%;
+  background:rgba(255,255,255,.08)}
+.hero h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;letter-spacing:-1px;line-height:1.28;position:relative}
+.hero p{margin-top:12px;font-size:15.5px;opacity:.94;max-width:620px;position:relative}
+.hstats{display:flex;gap:34px;margin-top:26px;flex-wrap:wrap;position:relative}
+.hstat b{display:block;font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.15}
+.hstat span{font-size:12px;opacity:.85}
+
+/* ── entries ── */
+.entries{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
+@media(max-width:860px){.entries{grid-template-columns:1fr}}
+.entry{background:var(--card);border:1px solid var(--pline);border-radius:16px;padding:24px;text-align:left;
+  cursor:pointer;transition:.25s;font-family:inherit;box-shadow:var(--sh);position:relative;overflow:hidden}
+.entry::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,var(--p2),var(--p))}
+.entry:hover{transform:translateY(-4px);box-shadow:var(--sh2)}
+.entry .n{font-size:10.5px;font-weight:800;letter-spacing:1.5px;color:var(--p3);background:var(--pbg);
+  display:inline-block;padding:3px 9px;border-radius:10px}
+.entry h3{margin-top:11px;font-size:18px;font-weight:750}
+.entry p{margin-top:7px;font-size:13.5px;color:var(--ink2);line-height:1.8}
+
+/* ── card / section ── */
+.sec{margin-top:26px}
+.sechd{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.sechd h2{font-size:19px;font-weight:780;letter-spacing:-.3px}
+.sechd h2::before{content:"";display:inline-block;width:4px;height:16px;border-radius:2px;margin-right:9px;
+  vertical-align:-2px;background:linear-gradient(180deg,var(--p2),var(--p))}
+.sechd span{font-size:12.5px;color:var(--ink3)}
+.card{background:var(--card);border:1px solid var(--pline);border-radius:16px;padding:20px;box-shadow:var(--sh)}
+.card h4{font-size:15.5px;font-weight:750;color:var(--p);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+/* ── kpi ── */
+.kpi{background:var(--card);border:1px solid var(--pline);border-radius:16px;padding:18px 20px;box-shadow:var(--sh);
+  position:relative;overflow:hidden;transition:.25s}
+.kpi:hover{transform:translateY(-3px);box-shadow:var(--sh2)}
+.kpi u{text-decoration:none;font-size:11.5px;color:var(--ink3);font-weight:650;display:block}
+.kpi b{display:block;font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1.2;margin-top:5px;
+  background:linear-gradient(135deg,var(--p2),var(--p));-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent}
+.kpi small{font-size:12px;color:var(--ink3);display:block;margin-top:3px;font-weight:600}
+
+/* ── chip ── */
+.chip{display:inline-block;font-size:11.5px;padding:4px 10px;background:var(--pbg);color:var(--p3);
+  border-radius:11px;cursor:pointer;transition:.18s;border:none;font-family:inherit;font-weight:600;margin:0 6px 6px 0}
+.chip:hover{background:var(--p);color:#fff}
+.chip.on{background:linear-gradient(135deg,var(--p2),var(--p));color:#fff}
+.pill{font-size:11px;font-weight:800;padding:3px 9px;border-radius:9px}
+.pill.ok{background:rgba(0,168,112,.12);color:var(--ok)}
+.pill.warn{background:rgba(255,143,31,.14);color:var(--warn)}
+.pill.bad{background:rgba(229,72,77,.12);color:var(--bad)}
+.pill.na{background:#F2F2F5;color:var(--ink3)}
+
+/* ── form ── */
+.form{background:var(--card);border:1px solid var(--pline);border-radius:16px;padding:20px;box-shadow:var(--sh)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:13px}
+.fi label{display:block;font-size:11.5px;font-weight:650;color:var(--ink2);margin-bottom:5px}
+.fi input,.fi select{width:100%;padding:9px 11px;border:1px solid var(--pline);border-radius:9px;font-size:14px;
+  font-family:inherit;background:#FFFBFC;transition:.2s}
+.fi input:focus,.fi select:focus{outline:none;border-color:var(--p);background:#fff;box-shadow:0 0 0 3px rgba(233,30,99,.09)}
+.btn{margin-top:16px;padding:11px 26px;background:linear-gradient(135deg,var(--p2),var(--p));color:#fff;border:none;
+  border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s;
+  box-shadow:0 3px 12px rgba(233,30,99,.26)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(233,30,99,.34)}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+/* ── table ── */
+.tb{background:var(--card);border:1px solid var(--pline);border-radius:14px;overflow:auto;box-shadow:var(--sh)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:11px 14px;text-align:left;font-size:11px;letter-spacing:.6px;color:var(--p3);font-weight:800;
+  background:var(--pbg2);border-bottom:1px solid var(--pline);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--line);color:var(--ink2);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FFFAFC}
+td b{color:var(--ink)}
+.hot{color:var(--p);font-weight:800}
+.stars{color:#F06292;letter-spacing:-1.5px;font-size:13px}
+
+/* ── insight box ── */
+.ibox{background:linear-gradient(135deg,#FFF8FB 0%,#FFEEF5 100%);padding:16px 20px;border-radius:12px;
+  font-size:13px;color:var(--ink2);line-height:1.85;border-left:3px solid var(--p);margin-top:14px}
+.ibox b{color:var(--p3)}
+.cap{font-size:11.5px;color:var(--ink3);line-height:1.75;margin-top:5px}
+.cap b{color:var(--ink2);font-weight:700}
+.cap .sep{color:var(--pline);margin:0 6px}
+/* ── 问题卡：每个 tab 顶部的「为什么做这个」── */
+.probm{background:linear-gradient(135deg,#FFF1F6 0%,#FBF3FF 100%);
+  border:1px solid var(--pline);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+.probm .prow{display:grid;grid-template-columns:auto 1fr;gap:10px 12px;align-items:start}
+.probm .plab{font-size:11px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--p);
+  border-radius:5px;padding:3px 8px;white-space:nowrap;line-height:1.5;margin-top:1px}
+.probm .plab.b2{background:#B06AC9}
+.probm .plab.b3{background:#2A2A2A}
+.probm .ptxt{font-size:13px;color:var(--ink2);line-height:1.9}
+.probm .ptxt b{color:var(--p3);font-weight:750}
+/* ── 对照基准强调卡 ── */
+.bmk{border:2px solid var(--p);border-radius:14px;padding:15px 17px;margin-bottom:14px;
+  background:linear-gradient(135deg,#FFF5F9,#fff)}
+.bmk .bhd{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px}
+.bmk .btag{font-size:11px;font-weight:800;color:#fff;background:var(--p);border-radius:5px;padding:3px 9px}
+.bmk .bttl{font-size:14.5px;font-weight:800;color:var(--p3)}
+.bmk .bgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:11px}
+.bmk .bcell{background:#fff;border:1px solid var(--pline);border-radius:9px;padding:9px 11px}
+.bmk .bcell u{display:block;text-decoration:none;font-size:10.5px;color:var(--ink3);font-weight:700;margin-bottom:3px}
+.bmk .bcell b{font-size:16px;font-weight:820;color:var(--p);letter-spacing:-.3px}
+.bmk .bcell small{display:block;font-size:10px;color:var(--ink3);margin-top:2px;font-weight:600}
+.bmk .bwhy{font-size:12.5px;color:var(--ink2);line-height:1.9}
+.bmk .bwhy b{color:var(--p3);font-weight:750}
+@media(max-width:880px){.bmk .bgrid{grid-template-columns:repeat(2,1fr)}}
+.shots{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 10px;scroll-snap-type:x mandatory}
+.shots::-webkit-scrollbar{height:7px}
+.shots::-webkit-scrollbar-thumb{background:var(--pline);border-radius:4px}
+.shots img{height:340px;width:auto;flex:none;border-radius:10px;border:1px solid var(--pline);
+  box-shadow:0 2px 10px rgba(233,30,99,.07);scroll-snap-align:start;cursor:zoom-in;transition:.2s}
+.shots img:hover{box-shadow:0 6px 20px rgba(233,30,99,.16);transform:translateY(-2px)}
+.lightbox{position:fixed;inset:0;background:rgba(20,10,14,.86);z-index:999;display:none;
+  align-items:center;justify-content:center;padding:28px;cursor:zoom-out}
+.lightbox.on{display:flex}
+.lightbox img{max-width:96vw;max-height:92vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+details.card>summary::-webkit-details-marker{display:none}
+details.card[open]>summary{border-bottom:1px solid var(--pline);padding-bottom:9px;margin-bottom:4px}
+details.card>summary:hover{color:var(--p)}
+.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0;position:sticky;top:60px;z-index:20;
+  background:rgba(255,247,249,.96);backdrop-filter:blur(10px);padding:8px 0}
+.stab{padding:7px 15px;border-radius:9px;font-size:13px;font-weight:700;color:var(--ink2);
+  background:#fff;border:1px solid var(--pline);cursor:pointer;font-family:inherit;transition:.2s;white-space:nowrap}
+.stab:hover{color:var(--p);border-color:var(--p2)}
+.stab.on{background:linear-gradient(135deg,var(--p2),var(--p));color:#fff;border-color:transparent}
+.spane{display:none}.spane.on{display:block;animation:fi .3s ease}
+
+/* ── percentile bar ── */
+.pbrow{margin-bottom:12px}
+.pbtop{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink2);margin-bottom:5px}
+.pbtop b{color:var(--ink);font-weight:700}
+.pbtrack{height:8px;background:#F7EAEF;border-radius:5px;position:relative}
+.pbfill{height:100%;border-radius:5px;background:linear-gradient(90deg,#FFC1CE,var(--p));transition:width .5s cubic-bezier(.16,1,.3,1)}
+.pbmark{position:absolute;top:-4px;width:3px;height:16px;background:var(--ink);border-radius:2px}
+.pbticks{display:flex;justify-content:space-between;font-size:9.5px;color:var(--ink3);margin-top:3px}
+
+/* ── funnel ── */
+.fr{display:flex;align-items:center;gap:14px;padding:8px 0;flex-wrap:wrap}
+.fr label{width:140px;font-size:13px;font-weight:650;color:var(--ink2)}
+.fr input[type=range]{flex:1;min-width:170px;accent-color:var(--p)}
+.fr .val{width:92px;text-align:right;font-size:14px;font-weight:750;color:var(--p)}
+.scen{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.sc{background:var(--pbg2);border:1px solid var(--pline);border-radius:12px;padding:15px;text-align:center}
+.sc.mid{background:linear-gradient(160deg,var(--pbg),#fff);border-color:#F8BBD0}
+.sc u{text-decoration:none;font-size:11px;font-weight:800;letter-spacing:1px;color:var(--ink3)}
+.sc b{display:block;font-size:23px;font-weight:800;letter-spacing:-1px;margin-top:4px}
+.sc.mid b{color:var(--p)}
+
+/* misc */
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin-top:10px}
+.ldot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:0px}
+.empty{padding:52px 20px;text-align:center;color:var(--ink3);font-size:13.5px;background:var(--card);
+  border:1px dashed var(--pline);border-radius:14px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--pbg);border-top-color:var(--p);
+  border-radius:50%;animation:sp .7s linear infinite;vertical-align:-3px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.mt14{margin-top:14px}.mt20{margin-top:20px}
+footer{padding:34px 0 10px;text-align:center;font-size:11.5px;color:var(--ink3)}
+</style>
+<script src="demo-shim.js"></script>
+</head>
+<body>
+<div id="demoBanner" style="position:sticky;top:0;z-index:999;background:linear-gradient(90deg,#7C5CD6,#B565C9);
+  color:#fff;padding:9px 16px;font-size:13px;line-height:1.6;text-align:center;letter-spacing:.2px">
+  <b>演示数据</b>　本页全部数据均为<b>虚拟合成</b>，用于产品功能演示；不含任何真实业务数据、真实账号或真实经营指标。AI 结论为预置示例。
+</div>
+
+<div class="topbar"><div class="tbin">
+  <div class="brand">先知<em>后行</em></div>
+  <div class="brandsub">先看清，再动手<span style="font-weight:500;opacity:.72;margin-left:8px">创作者营销与商业服务 · 买手运营 · </span><button id="introName" class="intro-name" onclick="openIntro()" title="点击查看自我介绍">王雪<span class="intro-dot"></span></button></div>
+  <div class="sp"></div>
+  <div class="tabs">
+    <button class="tab on" data-p="home">首页</button>
+    <button class="tab" data-p="diag">商业价值诊断</button>
+    <button class="tab" data-p="cat">品类经营指南</button>
+    <button class="tab" data-p="plan">场次方案生成</button>
+    <button class="tab" data-p="case">实证案例</button>
+    
+  </div>
+</div></div>
+
+<!-- ══ 首页 ══ -->
+<div class="page on" id="p-home"><div class="wrap">
+  <div class="hero">
+    <h1>让账号诊断有依据<br>让品类拓新有指南</h1>
+    <p>买手运营工作中发现的两个 case：一是判断一个新开买手适合走哪条路，二是帮一个成熟买手拓一个陌生品类。把这两件事变成可查、可比、可复用的依据。</p>
+    <div class="hstats" id="heroStats"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sechd"><h2>两个 case，两条主线</h2><span>都来自买手运营的真实工作场景</span></div>
+    <div class="ibox">这两个 case 对应两条核心链路——<b>判断一个人该怎么走</b>（诊断 → 对标 → 方案），和 <b>帮一个人走进新领域</b>（品类认知 → 备货 → 执行）。后面的六个模块，都是围绕这两件事展开的。</div>
+    <div class="g2">
+      <div class="card" style="border:2px solid var(--pline)">
+        <h4>① 新开买手<span class="pill warn">刚建联</span></h4>
+        <div class="ibox" style="margin-top:10px">
+          <b>建联时最先要判断什么</b><br>
+          「这个账号现在处在什么水平？」「适合走蒲公英还是电商？」「商业价值该怎么评估？」「和他同水平的人在做什么？」
+        </div>
+        <div style="margin-top:12px;font-size:13px;color:var(--ink2);line-height:1.95">
+          这些判断以前靠经验，答不准也答不全。现在把三条经营路径（蒲公英 / 电商 / 内容）拆开，
+          每条都跟<b>同垂类同粉段的全站水位</b>对比，再按<b>身份类型 / 主营品类 / 客单价档位</b>找出真正同水平的标杆，
+          看他们最近卖什么、接什么单、做什么内容。
+        </div>
+        <button class="btn" data-go="diag">去做账号诊断 →</button>
+      </div>
+
+      <div class="card" style="border:2px solid var(--pline)">
+        <h4>② 存量买手<span class="pill ok">已在播</span></h4>
+        <div class="ibox" style="margin-top:10px">
+          <b>他和我共同面对什么</b><br>
+          已经在播的买手要拓新品类——比如一直播黄金，现在要开沉香专场。
+          买手对新品类一无所知，<b>我自己也不一定懂</b>。而优质买手一旦出现选品失误，损失的不只是一场 GMV。
+        </div>
+        <div style="margin-top:12px;font-size:13px;color:var(--ink2);line-height:1.95">
+          所以要有一份能从 0 到 1 建立品类认知的东西：<b>什么是好货、怎么分等级、行话怎么说、雷在哪里</b>，
+          再叠上站内真实数据——<b>谁在做、卖什么价、爆品长什么样、预热怎么排</b>，最后落成一份可执行的场次方案。
+        </div>
+        <button class="btn" data-go="cat">去看品类经营指南 →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sechd"><h2>一个真实案例</h2><span>存量买手拓品类的完整过程</span></div>
+    <div class="card">
+      <h4>蘑菇妈妈 · 沉香专场<span class="pill ok">存量买手拓品类</span></h4>
+      <div style="margin-top:10px;font-size:13.5px;color:var(--ink2);line-height:1.95">
+        3 月建联，4-6 月连续做黄金专场，8 月要开一个跨品类、高专业度的沉香专场。
+        我在这场负责预热规划、货盘爆品思路与数据复盘，把品类指南的方向落到执行，最终双场 <b style="color:var(--p)">GMV 1,580 万</b>、客单 <b style="color:var(--p)">9,780 元/人</b>、文玩珠宝榜 TOP1。
+        <br><br>
+        案例页拆解了指南怎么被用进这场的<b>三个关键决策</b>（价格带坑位 / 产地等级命名 / 预热建立专业认知），每个都有真实成交数据验证，并附上我复盘后的思考。
+      </div>
+      <button class="btn" data-go="case">看实证案例 →</button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sechd"><h2>已构建品类</h2><span>跨 2 个赛道，点击直达经营指南</span></div>
+    <div id="homeCats" class="g4"></div>
+  </div>
+  <div class="ibox" id="metaNote">加载中…</div>
+</div></div>
+
+<!-- ══ 诊断 ══ -->
+<div class="page" id="p-diag"><div class="wrap">
+  <div class="sec">
+    <div class="sechd"><h2>创作者商业价值诊断</h2><span>对照同垂类同粉段全站水位</span></div>
+    <div class="probm"><div class="prow">
+      <span class="plab">卡点</span><div class="ptxt">建联新买手时，「这个号到底行不行」全凭经验判断。看粉丝量会被大号误导，看 GMV 又漏掉刚起步的潜力号——根本问题是<b>没有参照系</b>：一个 80 万粉的时尚号月 GMV 500 万，算好还是算差？不知道。</div>
+      <span class="plab b2">做法</span><div class="ptxt">引入<b>对照组思维</b>：把全站创作者按「垂类 × 粉丝段」切成 233 个基准组，每个指标只跟<b>同类同体量的人</b>比，算出百分位；再把变现拆成蒲公英 / 电商 / 内容三条路分别打分。</div>
+      <span class="plab b3">产出</span><div class="ptxt">一张可直接用于建联沟通的诊断单：他强在哪、弱在哪、下一步主攻哪条路、该对标谁。</div>
+    </div></div>
+    <div class="form">
+      <div class="fi"><label>搜索买手 · 支持昵称 / UID / 主页链接（UID 走实时取数，不受底池限制）</label>
+        <input id="f_search" placeholder="昵称如「薛佳凝」，或直接粘贴 UID / 主页链接" autocomplete="off"></div>
+      <div id="searchOut" style="margin-top:10px"></div>
+      <div class="cap" style="margin-top:8px">默认载入示例账号「薛佳凝」，可直接搜索或粘贴 UID 替换为任意买手</div>
+    </div>
+    <details class="form mt14"><summary style="cursor:pointer;font-size:13px;font-weight:650;color:var(--ink2)">或手动填写指标</summary>
+      <div class="fgrid" style="margin-top:14px">
+        <div class="fi"><label>账号昵称</label><input id="f_nick" placeholder="选填"></div>
+        <div class="fi"><label>UID</label><input id="f_uid" placeholder="选填"></div>
+        <div class="fi"><label>一级垂类</label><select id="f_tax"></select></div>
+        <div class="fi"><label>粉丝数</label><input id="f_fans" type="number" value="546400"></div>
+        <div class="fi"><label>30日电商粉丝数</label><input id="f_ecmfans" type="number" value="30000"></div>
+        <div class="fi"><label>粉丝客单价</label><input id="f_aov" type="number" value="911"></div>
+        <div class="fi"><label>潜力电商规模</label><input id="f_pot" type="number" value="162000000"></div>
+        <div class="fi"><label>30日发文数</label><input id="f_note" type="number" value="12"></div>
+        <div class="fi"><label>30日篇均互动</label><input id="f_eng" type="number" value="3000"></div>
+        <div class="fi"><label>30日互动率(‰)</label><input id="f_engr" type="number" value=""></div>
+        <div class="fi"><label>30日总互动量</label><input id="f_ces" type="number" value=""></div>
+        <div class="fi"><label>是否开通品牌合作</label><select id="f_bp"><option value="1">已开通</option><option value="0">未开通</option></select></div>
+        <div class="fi"><label>图文报价</label><input id="f_pic" type="number" value="30000"></div>
+        <div class="fi"><label>视频报价</label><input id="f_vid" type="number" value="50000"></div>
+        <div class="fi"><label>近一年商单数</label><input id="f_dc" type="number" value="8"></div>
+        <div class="fi"><label>近一年商单流水</label><input id="f_dr" type="number" value="300000"></div>
+        <div class="fi"><label>30日K播DGMV</label><input id="f_klive" type="number" value="0"></div>
+      </div>
+      <button class="btn" id="btnDiag">生成诊断</button>
+    </details>
+    <div id="profileOut" class="mt20"></div>
+    <div id="diagOut" class="mt20"></div>
+    <div id="fansBuyOut" class="mt20"></div>
+    <div id="peerOut" class="mt20"></div>
+    <div id="diagAI" class="mt14"></div>
+  </div>
+</div></div>
+
+<!-- ══ 品类 ══ -->
+<div class="page" id="p-cat"><div class="wrap">
+  <div class="sec">
+    <div class="sechd"><h2>品类经营指南</h2><span>输入品类，生成完整打法</span></div>
+    <div class="probm"><div class="prow">
+      <span class="plab">卡点</span><div class="ptxt">买手要拓一个陌生品类（eg.一直播黄金，现在要开沉香专场）。在接触跨品类、全新品类且没有前置专业知识铺垫的情况下，<b>买手本人和运营需要做大量的准备工作</b>，信息冗杂且耗时耗力，而优质买手一旦出现选品失误，损失的不只是一场 GMV。</div>
+      <span class="plab b2">做法</span><div class="ptxt">把品类认知拆成<b>知识层 + 数据层</b>：知识层沉淀什么是好货、怎么分等级、行话怎么说、雷在哪儿；数据层接站内真实场次——谁在做、卖什么价、爆品长什么样。AI 在两层之上做解读，而不是凭空编。</div>
+      <span class="plab b3">产出</span><div class="ptxt">21 个品类的可查手册。新人开一个没做过的专场，不再依赖口口相传的经验，<b>把一次性的经验变成组织能力</b>。在此基础上，再由 AI 基于站内大盘实际数据提炼出该品类的<b>爆品公式（备什么货）与预热内容公式（发什么能拉到预约）</b>。<span style="color:var(--p);font-weight:600">↓ AI 品类解读在本页最下方，选定品类后点击生成。</span></div>
+    </div></div>
+    <div class="form">
+      <div class="fi"><label>品类关键词</label><input id="f_cat" placeholder="如：沉香 / 和田玉 / 黄金"></div>
+      <div id="catChips" style="margin-top:10px"></div>
+      <button class="btn" id="btnCat">生成指南</button>
+    </div>
+    <div id="catOut" class="mt20"></div>
+    <div id="catAI" class="mt14"></div>
+  </div>
+</div></div>
+
+<!-- ══ 场次方案 ══ -->
+<div class="page" id="p-plan"><div class="wrap">
+  <div class="sec">
+    <div class="sechd"><h2>场次方案生成</h2><span>买手 × 品类 × 目标 GMV → 七段式执行方案</span></div>
+    <div class="probm"><div class="prow">
+      <span class="plab">卡点</span><div class="ptxt">诊断和指南都是「看」，真要落地还得有人<b>把判断翻译成可执行的一场直播</b>。以前写一份全案要半天，而且每个人写出来的质量参差不齐，货盘结构、预热节奏全靠个人习惯。</div>
+      <span class="plab b2">做法</span><div class="ptxt">把全案固化成<b>七段式结构</b>，用买手实际客单反推价格带、用目标 GMV 反推货型配比（引流 / 福利 / 利润 / 镇场），每一条建议都能追溯到具体数字。</div>
+      <span class="plab b3">产出</span><div class="ptxt">输入买手 + 品类 + 目标 GMV，几分钟拿到一份能直接发给买手的方案，<b>把个人经验变成统一 SOP</b>。</div>
+    </div></div>
+    <div class="form">
+      <div class="fgrid">
+        <div class="fi"><label>买手（昵称或 UID，选填）</label>
+          <input id="pl_buyer" placeholder="如：蘑菇妈妈呀 / 薛佳凝，留空则只按品类出方案" autocomplete="off">
+          <div id="plSug" style="margin-top:6px"></div>
+          <input type="hidden" id="pl_uid"></div>
+        <div class="fi"><label>品类</label><select id="pl_cat"></select></div>
+        <div class="fi"><label>目标 GMV（万元）</label><input id="pl_gmv" type="number" value="1000"></div>
+      </div>
+      <div id="pl_hint" class="ibox" style="margin-top:12px">整合账号诊断 + 品类数据 + 对标，产出可直接执行的方案。方案结构固定为七段：目标测算 / 货盘结构 / 预热时间轴 / 预约笔记选题 / 直播当天节奏 / GMV 四来源拆解 / 关键成功要素与风险。结构不变，AI 只填内容。</div>
+      <button class="btn" id="btnPlan">生成方案</button>
+    </div>
+    <div id="planCtx" class="mt20"></div>
+    <div id="planOut" class="mt14"></div>
+  </div>
+</div></div>
+
+<!-- ══ 案例 ══ -->
+<div class="page" id="p-case"><div class="wrap">
+  <div class="sec">
+    <div class="sechd"><h2>实证案例 · 蘑菇妈妈呀 × 沉香溯源专场</h2>
+      <span>沉香品类指南在这场千万级大播中的应用与验证</span></div>
+
+    <div class="card"><h4>怎么走到这一步的</h4>
+      <div class="g4 mt14">
+        <div class="kpi"><u>3 月</u><b style="font-size:17px">建联</b><small>纳入买手运营</small></div>
+        <div class="kpi"><u>4–6 月</u><b style="font-size:17px">黄金专场</b><small>连续开播，跑通模式</small></div>
+        <div class="kpi"><u>7 月</u><b style="font-size:17px">决定拓沉香</b><small>跨入高专业度、缺供应链积累的新赛道</small></div>
+        <div class="kpi"><u>8 月 1-2 日</u><b style="font-size:17px">双场大播</b><small>马来西亚寻香记</small></div>
+      </div>
+      <div class="ibox">起点是真实的认知门槛：沉香是高专业度的跨品类赛道，运营并非该品类的商家或供应商，前期对产地、等级、货源的了解不足以直接支撑与买手完全上手、对接；用户侧也在后台高频私信「不太懂野生和种植怎么区分」「喜欢沉香却一直不敢下手」——<b>高客单非标品的第一道坎不是价格，是不敢买</b>。</div>
+    </div>
+
+    <div class="sechd mt20"><h2>结果</h2></div>
+    <div class="g4">
+      <div class="kpi"><u>双场 GMV</u><b>1,580 万+</b><small>DGMV 1,132 万+（全品类）</small></div>
+      <div class="kpi"><u>客单价</u><b>9,780</b><small>元 / 人</small></div>
+      <div class="kpi"><u>预约用户 GMV 贡献</u><b>57%</b><small>仅占 4.1% 观播量</small></div>
+      <div class="kpi"><u>种收笔记 ROI</u><b>104.8</b><small>笔记投入 10.8 万</small></div>
+    </div>
+
+    <div class="sechd mt20"><h2>指南怎样支撑了这场 · 我参与的三个环节</h2>
+      <span>这场中我参与的部分：预热笔记参考规划 · 货盘爆品思路 · 数据复盘</span></div>
+    <div class="ibox"><b>这不是两张孤立的数据表。</b>这份沉香经营指南基于全站 229 场、191 个 SKU 沉淀出方向，在这两场大播的选品与预热中得到了应用，也被真实成交数据反过来验证。</div>
+
+    <div class="card" style="border-left:4px solid var(--p);margin-top:14px">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
+        <span style="font-size:26px;font-weight:800;color:var(--p);line-height:1">01</span>
+        <h4 style="font-size:17px">价格带坑位：主力成交带在哪，坑位就向哪倾斜</h4></div>
+      <div class="g3">
+        <div style="background:#FAFAFB;border-radius:10px;padding:13px"><div style="font-size:11.5px;color:var(--ink3);font-weight:700;margin-bottom:7px">📖 指南给的方向</div><div style="font-size:13px;color:var(--ink2);line-height:1.85">全站沉香主力成交带是 <b>2千-1万</b>（SKU 121、DGMV 3928万，最大盘）；<b>1万-5万</b> 是高客单镇场带，单坑产出最高</div></div>
+        <div style="background:#FFF3F7;border-radius:10px;padding:13px"><div style="font-size:11.5px;color:var(--p);font-weight:700;margin-bottom:7px">🎯 这场的动作</div><div style="font-size:13px;color:var(--ink);line-height:1.85">基本盘设在 2千-1万（<b>58.1%</b>）；1万-5万 镇场带提升至 <b>32%</b>，用于承接高客单</div></div>
+        <div style="background:linear-gradient(135deg,#FFE3EC,#FFF3F7);border-radius:10px;padding:13px"><div style="font-size:11.5px;color:var(--p3);font-weight:700;margin-bottom:7px">✅ 结果</div><div style="font-size:13px;color:var(--ink);line-height:1.6"><b style="font-size:19px;color:var(--p)">件均 4,092 元/件</b><br>沉香 SKU 明细 DGMV 1,072万</div></div>
+      </div>
+      <div id="yb1" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--p);margin-top:14px">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
+        <span style="font-size:26px;font-weight:800;color:var(--p);line-height:1">02</span>
+        <h4 style="font-size:17px">产地 / 等级 → 商品命名：把高价值信号写入 SKU 名</h4></div>
+      <div class="g2">
+        <div style="background:#FAFAFB;border-radius:10px;padding:13px"><div style="font-size:11.5px;color:var(--ink3);font-weight:700;margin-bottom:7px">📖 指南给的方向</div><div style="font-size:13px;color:var(--ink2);line-height:1.85">产地件均图谱（达拉干 7552、芽庄 4864、沉水 4635…）+ 五级等级体系（奇楠 &gt; 沉水级 &gt; 沉水浮 &gt; 半沉 &gt; 入门）——哪些产地/等级是高货，一目了然</div></div>
+        <div style="background:#FFF3F7;border-radius:10px;padding:13px"><div style="font-size:11.5px;color:var(--p);font-weight:700;margin-bottom:7px">🎯 这场的动作</div><div style="font-size:13px;color:var(--ink);line-height:1.85">商品命名中写入<b>产地与等级</b>，使高客单货品一眼可辨、专业感更强，降低高价决策门槛</div></div>
+      </div>
+      <div class="cap" style="margin-top:12px"><b>验证</b>这场爆品 TOP8 中，<b style="color:var(--p)">标红的产地/等级词</b>均来自指南图谱——它们最终都成为了实际成交的主力：</div>
+      <div id="yb2" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--p);margin-top:14px">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
+        <span style="font-size:26px;font-weight:800;color:var(--p);line-height:1">03</span>
+        <h4 style="font-size:17px">预热强化产地与等级 → 建立专业认知 → 提升转化 <span style="font-size:11px;background:var(--p);color:#fff;padding:2px 8px;border-radius:6px;font-weight:700">核心</span></h4></div>
+      <div class="g3">
+        <div style="background:#FAFAFB;border-radius:10px;padding:13px"><div style="font-size:11.5px;color:var(--ink3);font-weight:700;margin-bottom:7px">📖 指南给的方向</div><div style="font-size:13px;color:var(--ink2);line-height:1.85">沉香按「产地×含油量×香韵×年份」定价，15 个行话、5 级等级——<b>强知识门槛品类</b></div></div>
+        <div style="background:#FFF3F7;border-radius:10px;padding:13px"><div style="font-size:11.5px;color:var(--p);font-weight:700;margin-bottom:7px">🎯 这场的动作</div><div style="font-size:13px;color:var(--ink);line-height:1.85">在预约笔记与视频中反复强化产地（文莱/达拉干）与等级（沉水/奇楠），先讲清其价值构成</div></div>
+        <div style="background:linear-gradient(135deg,#FFE3EC,#FFF3F7);border-radius:10px;padding:13px"><div style="font-size:11.5px;color:var(--p3);font-weight:700;margin-bottom:7px">✅ 结果</div><div style="font-size:13px;color:var(--ink);line-height:1.6"><b style="font-size:19px;color:var(--p)">转化率 22.4%</b><br>是非预约的 19.6 倍</div></div>
+      </div>
+      <div id="yb3" style="margin-top:12px"></div>
+      <div class="ibox">沉香的价值构成对普通消费者存在认知门槛；预热阶段先把产地与等级的定价逻辑讲清楚，粉丝进入直播间前便已建立“什么是好货、为什么贵”的专业认知——<b>高客单的信任门槛因此提前跨过，转化阻力更小。把品类知识转化为转化率，是这场值得记录的一点。</b></div>
+    </div>
+
+    <div class="sechd mt20"><h2>内容怎么做的</h2><span>6 篇溯源笔记递进式蓄水 + 11 篇预告，履约率 71%</span></div>
+    <div class="g3">
+      <div class="card"><h4>溯源</h4><p style="margin-top:8px;font-size:13.5px;color:var(--ink2);line-height:1.9">「马来溯源｜一趟雨林，让我重新认识了野生沉香」——把买手带到产地，第一视角解决「怕买到假货」。</p></div>
+      <div class="card"><h4>科普</h4><p style="margin-top:8px;font-size:13.5px;color:var(--ink2);line-height:1.9">「文莱｜达拉干！高端沉香你选谁」「大师亲鉴！收藏级野生沉香」——把产地和等级讲清楚，降低决策门槛。</p></div>
+      <div class="card"><h4>预告</h4><p style="margin-top:8px;font-size:13.5px;color:var(--ink2);line-height:1.9">「文莱珍宝之匣首发❗设计款低至…」——上新剧透 + 价格锚点，直接拉预约。</p></div>
+    </div>
+    <div class="g2 mt14">
+      <div class="card"><h4>预热笔记实拍</h4><div class="cap"><b>来源</b>该场预告笔记清单</div>
+        <img src="https://xhs-doc.xhscdn.com/1040g4dg323fi3pc7n400000000esr2qdol1v5l0" style="width:100%;border-radius:12px;margin-top:10px;border:1px solid var(--pline)"></div>
+      <div class="card"><h4>用户在问什么</h4><div class="cap"><b>来源</b>直播后台私信截图</div>
+        <img src="https://xhs-doc.xhscdn.com/1040g4dg323fi3pc46u00000000esr2qdt8bqhvo" style="width:100%;max-width:340px;border-radius:12px;margin-top:10px;border:1px solid var(--pline)"></div>
+    </div>
+
+    <div class="card mt14"><h4>场次战报</h4><div class="cap"><b>来源</b>马来西亚寻香记 · 8月1-2日双场</div>
+      <img src="https://xhs-doc.xhscdn.com/1040g4dg323fi3pc86s70000000esr2qdemro45g" style="width:100%;max-width:300px;border-radius:12px;margin-top:10px;border:1px solid var(--pline)"></div>
+
+    <div class="sechd mt20"><h2>复盘时我多留意的一个维度</h2><span>常规复盘多止步于退款率，我尝试再多看一层</span></div>
+    <div class="card">
+      <p style="font-size:14px;color:var(--ink);line-height:1.95">这场退款率 <b>61.1%</b> 偏高（GMV 1,580万 / 有效成交 613万）。常规复盘多关注退款率与销售额；我认为还应关注一个维度——<b>商家的发货率与发货速度</b>。</p>
+      <div class="ibox">在标杆买手的大场中，发货速度直接影响粉丝口碑与复购，而这一变量在许多品类的复盘中容易被忽略。因此在后续选品中，我会将「发货能力」纳入商家筛选维度。<b>一场大播真正的口碑，往往不在下播那一刻，而在货品送达粉丝手中那一刻。</b></div>
+    </div>
+
+    <div class="card mt20" style="background:linear-gradient(135deg,#FFF3F7,#fff)">
+      <h4>这套链路如果完全人工完成</h4>
+      <p style="margin-top:8px;font-size:14.5px;color:var(--ink);font-weight:600;line-height:1.95">
+        需要包括但不限于以下环节：<b style="color:var(--p3)">翻场次、扒爆品、看笔记、问供应商</b>。<br>
+        「先知后行」把这个过程压缩到三分钟，并且换任何一个品类都成立：现在已经跑通 <span id="caseCatCnt">21</span> 个品类、两个赛道。</p>
+    </div>
+
+  </div>
+</div></div>
+
+<!-- 工具集 tab 已在演示版中移除：原内容包含内部系统界面截图 -->
+
+<!-- ══ 自我介绍：浮动按钮 + 弹窗 ══ -->
+<style>
+.intro-name{font:inherit;font-weight:700;color:var(--p3);background:linear-gradient(180deg,transparent 62%,var(--pbg) 62%);
+  border:none;cursor:pointer;padding:0 2px;position:relative;transition:color .2s}
+.intro-name:hover{color:var(--p)}
+.intro-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--p);
+  margin-left:3px;vertical-align:super;animation:introPulse 1.8s infinite}
+@keyframes introPulse{0%{box-shadow:0 0 0 0 rgba(233,30,99,.5)}70%{box-shadow:0 0 0 7px rgba(233,30,99,0)}100%{box-shadow:0 0 0 0 rgba(233,30,99,0)}}
+.intro-fab{position:fixed;right:22px;bottom:24px;z-index:120;display:flex;align-items:center;gap:8px;
+  padding:12px 18px;border:none;border-radius:999px;cursor:pointer;color:#fff;font-size:14px;font-weight:700;
+  background:linear-gradient(120deg,var(--p),var(--p2));box-shadow:0 8px 24px rgba(233,30,99,.36);
+  transition:transform .2s,box-shadow .2s}
+.intro-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(233,30,99,.46)}
+.intro-fab .ava{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,.85)}
+.intro-mask{position:fixed;inset:0;z-index:200;background:rgba(42,42,42,.55);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .25s}
+.intro-mask.on{display:flex;opacity:1}
+.intro-card{background:#fff;border-radius:20px;max-width:940px;width:100%;max-height:88vh;overflow:hidden;
+  display:grid;grid-template-columns:38% 62%;box-shadow:0 24px 60px rgba(0,0,0,.28);transform:translateY(16px);transition:transform .25s}
+.intro-mask.on .intro-card{transform:none}
+.intro-photo{position:relative;background:#f3e9ee}
+.intro-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.intro-photo .pcap{position:absolute;left:0;right:0;bottom:0;padding:16px 18px;color:#fff;font-size:13px;
+  background:linear-gradient(0deg,rgba(0,0,0,.55),transparent)}
+.intro-body{padding:26px 30px;overflow-y:auto;max-height:88vh}
+.intro-close{position:absolute;top:14px;right:16px;z-index:3;width:32px;height:32px;border:none;border-radius:50%;
+  background:rgba(255,255,255,.9);color:var(--ink);font-size:18px;cursor:pointer;line-height:1;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.intro-body h3{font-size:21px;font-weight:800;color:var(--ink);margin:0 0 3px}
+.intro-body .role{font-size:12.5px;color:var(--p3);font-weight:700;letter-spacing:.5px;margin-bottom:16px}
+.intro-sec{margin-top:18px}
+.intro-sec h4{font-size:14px;font-weight:800;color:var(--p);margin:0 0 8px;padding-left:9px;border-left:3px solid var(--p)}
+.intro-info{font-size:13px;color:var(--ink2);line-height:1.9}
+.intro-info b{color:var(--ink)}
+.intro-block{margin-top:11px}
+.intro-block .bt{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px}
+.intro-block .bd{font-size:12.5px;color:var(--ink2);line-height:1.85}
+.intro-block .bd em{font-style:normal;font-weight:700;color:var(--p3)}
+.intro-block ul{margin:4px 0 0;padding-left:16px}
+.intro-block li{font-size:12.5px;color:var(--ink2);line-height:1.8;margin-bottom:3px}
+@media(max-width:720px){
+  .intro-card{grid-template-columns:1fr;max-height:90vh;overflow-y:auto}
+  .intro-photo{height:260px}
+  .intro-body{max-height:none}
+}
+</style>
+
+<button class="intro-fab" onclick="openIntro()"><img class="ava" src="img/wangxue.jpg" alt="王雪">关于我 · 1 分钟自我介绍</button>
+
+<div class="intro-mask" id="introMask" onclick="if(event.target===this)closeIntro()">
+  <div class="intro-card">
+    <div class="intro-photo">
+      <img src="img/wangxue.jpg" alt="王雪">
+      <div class="pcap">王雪 · 上海</div>
+    </div>
+    <div class="intro-body">
+      <button class="intro-close" onclick="closeIntro()">×</button>
+      <h3>王雪</h3>
+      <div class="role">复旦大学 · 金融硕士（27 届）　|　求职方向：策略运营 / 广告业务 / 商业化</div>
+
+      <div class="intro-sec">
+        <h4>个人信息</h4>
+        <div class="intro-info">
+          复旦大学 金融硕士（27 届，推免保研）；本科 吉林大学 信用管理 · <b>rank 1/48</b> · GPA 3.93/4.0<br>
+          校院两级学生会执行主席 · 复旦经济学院党支部副书记
+        </div>
+      </div>
+
+      <div class="intro-sec">
+        <h4>小红书实习经历</h4>
+        <div class="intro-info">
+          <b>小红书 · 珠宝文玩买手运营组｜电商供给侧策略与运营</b><br>
+          岗位核心是电商供给侧经营：判断该引入哪些买手、如何匹配货盘与内容、如何放大经营量级。我的重心不在单场直播的现场执行，而在<b>把这些判断标准化，并沉淀为全组可复用的数据工具</b>。
+        </div>
+      </div>
+
+      <div class="intro-sec">
+        <h4>工作总结</h4>
+        <div class="intro-block">
+          <div class="bt">① 方案撰写与策略沉淀</div>
+          <div class="bd"><em>撰写 30+ 场</em>买手直播全案，覆盖平台介绍、账号洞察、对标分析、货盘规划到执行排期，并沉淀为标准结构与垂类 SOP。代表成果：财经买手冷启动首播 GMV <em>2,617 万</em>、预约用户贡献 <em>82.3%</em>，第二场 GPM 再提升 <em>35%</em>。</div>
+        </div>
+        <div class="intro-block">
+          <div class="bt">② 数据分析与业务拓展</div>
+          <ul>
+            <li>从 0 搭建买手拓新四层漏斗与 <em>8 维招商评分模型</em>，把“该不该投入一个账号”变成可排序标准，据此拓新张雨绮、宁静等 <em>10+ 位头部买手</em>，首场 GMV 保底 <em>500 万</em>；</li>
+            <li>为头部买手做品类选型：行业三维初筛 + <em>结算率四维拆解</em>；珠宝文玩直播退款率普遍高达 <em>80–90%</em>，仅看 GMV 会高估收益，据此把选品从“看体量”升级为“看可结算收益”；</li>
+            <li>拆解全站 <em>8,196 条</em>高预约笔记、提炼 <em>213 条</em>有效样本，归纳可复用的预热内容公式。</li>
+          </ul>
+        </div>
+        <div class="intro-block">
+          <div class="bt">③ AI 提效与工具矩阵</div>
+          <div class="bd">搭建从“用 AI 做单件事”到“对外数据产品”的完整体系：<b>方案自动化</b>（输入买手 ID 自动生成方案框架，全组复用）、买手<b>邀约洞察 / 粉丝洞察 / 高预约笔记参考池 / 行业备货与创作指南</b>等多个对外数据产品，最终收敛为端到端 AI 决策产品<b>「先知后行」</b>（覆盖 <em>21 个品类、17 万买手明细、233 组对照基准</em>）。</div>
+        </div>
+      </div>
+
+      <div class="intro-sec">
+        <h4>其他实习经历</h4>
+        <div class="intro-block">
+          <div class="bt">Shopee（上海）· 电商战略分析 PMO<span style="font-weight:400;color:var(--ink3)"> · 2025.10–2026.02</span></div>
+          <div class="bd">主导东南亚 5 大市场高潜卖家增长体系，设计「目标设定—达标核算—激励适配」全流程策略，激励核算效率 <em>+35%</em>；独立牵头 FY26 业务目标预测模型，预测偏差 <em>&lt;8%</em>。</div>
+        </div>
+        <div class="intro-block">
+          <div class="bt">创新工场 · 投资分析研究<span style="font-weight:400;color:var(--ink3)"> · 2025.02–2025.08</span></div>
+          <div class="bd">主导印尼电动车行业投研，以「政策—需求—供给—竞争」四维框架 + 10+ 专家访谈输出 30 页行业报告；将投后跟踪升级为运营+财务双维监控模型，成功预警已投项目业绩下滑。</div>
+        </div>
+        <div class="intro-block">
+          <div class="bt">中信证券 · 高端制造行业研究<span style="font-weight:400;color:var(--ink3)"> · 2024.11–2025.02</span></div>
+          <div class="bd">梳理锂电产业链格局，独立完成 2 份企业深度报告与估值分析；搭建数据跟踪模板，助团队提前 1 周完成季度行业总结。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openIntro(){document.getElementById('introMask').classList.add('on');document.body.style.overflow='hidden';}
+function closeIntro(){document.getElementById('introMask').classList.remove('on');document.body.style.overflow='';}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeIntro();});
+</script>
+
+</body>
+</html>
